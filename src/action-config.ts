@@ -89,8 +89,6 @@ export class ActionConfig {
 
     // verify we have the required configuration
     try {
-      assert.ok(this.author.name, 'Author name is undefined');
-      assert.ok(this.author.email, 'Author email is undefined');
       assert.ok(this.commitMessage, 'Commit message is undefined');
       if (this.bumpTypes.length === 0 && !this.defaultBumpType) {
         throw new Error('No bump types found and no default bump type given');

@@ -141,30 +141,6 @@ describe('utils', () => {
       email: 'rschneider@github.com',
     });
   });
-  it('requires author name', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-EMAIL': 'rschneider@github.com',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      'INPUT_KEYWORDS-MAJOR': 'MAJOR',
-      'INPUT_DEFAULT-BUMP-TYPE': 'patch',
-    });
-    expect(() => new ActionConfig()).toThrow();
-    expect(mockExitFailure).toBeCalledWith(
-      'Configuration is invalid; with error: AssertionError [ERR_ASSERTION]: Author name is undefined'
-    );
-  });
-  it('requires author email', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-NAME': 'Rob Schneider',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      'INPUT_KEYWORDS-MAJOR': 'MAJOR',
-      'INPUT_DEFAULT-BUMP-TYPE': 'patch',
-    });
-    expect(() => new ActionConfig()).toThrow();
-    expect(mockExitFailure).toBeCalledWith(
-      'Configuration is invalid; with error: AssertionError [ERR_ASSERTION]: Author email is undefined'
-    );
-  });
   it('requires commit message', async () => {
     setActionVars({
       'INPUT_AUTHOR-NAME': 'Rob Schneider',
