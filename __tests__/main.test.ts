@@ -1,15 +1,15 @@
 import * as fs from 'fs';
+import * as core from '@actions/core';
 import { run } from '../src/main';
-import { getFileBuffer, setActionVars, resetActionVars } from './test-utils';
+import { getCoreInputMock, getFileBuffer } from './test-utils';
 
-const mockReadFileSync = fs.readFileSync as jest.Mock;
+// mock utils
 const mockExitFailure = jest.fn().mockImplementation(() => {
   throw new Error();
 });
 const mockExitSuccess = jest.fn();
 const mockExecute = jest.fn();
 const mockLog = jest.fn();
-
 jest.mock('../src/utils', () => ({
   ...(jest.requireActual('../src/utils') as object),
   exitFailure: (message?: string) => mockExitFailure(message),
@@ -21,23 +21,39 @@ jest.mock('../src/utils', () => ({
     success: (message?: any) => mockLog(message),
   },
 }));
+
+// mock child_process
 jest.mock('child_process');
+
+// mock fs
+const mockReadFileSync = fs.readFileSync as jest.Mock;
 jest.mock('fs');
+
+// mock core
+const mockGetInput = core.getInput as jest.Mock;
+const mockSetOuput = core.setOutput as jest.Mock;
+jest.mock('@actions/core');
 
 const packageBuffer = getFileBuffer({ version: '1.2.3' });
 
 describe('main', () => {
-  afterEach(() => {
-    resetActionVars();
+  beforeAll(() => {
+    process.env['GITHUB_WORKSPACE'] = '/workspace/';
+    process.env['GITHUB_EVENT_PATH'] = '/workspace/event.json';
+  });
+  afterAll(() => {
+    process.env['GITHUB_WORKSPACE'] = undefined;
+    process.env['GITHUB_EVENT_PATH'] = undefined;
   });
   it('bumps the version according to the yaml configuration', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-NAME': 'Rob Schneider',
-      'INPUT_AUTHOR-EMAIL': 'rschneider@github.com',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      'INPUT_KEYWORDS-MINOR': 'feat',
-      GITHUB_EVENT_PATH: '/workspace/event.json',
-    });
+    mockGetInput.mockImplementation(
+      getCoreInputMock({
+        'author-name': 'Rob Schneider',
+        'author-email': 'rschneider@github.com',
+        'commit-message': '[skip ci]: Automated version bump {version}',
+        'keywords-minor': 'feat',
+      })
+    );
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
         pull_request: {
@@ -64,20 +80,22 @@ describe('main', () => {
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
       expect(mockLog.mock.calls).toEqual([
-        ["Found keyword match: 'feat'; for bump type: 'minor'"],
-        ["Using bump type: 'minor'"],
+        ['Found keyword match: feat; for bump type: minor'],
+        ['Using bump type: minor'],
       ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
+      expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.3.0']]);
     }
   });
   it('bumps the version according to the json configuration', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-NAME': 'Michael Collins',
-      'INPUT_AUTHOR-EMAIL': 'mcollins@github.com',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      INPUT_CONFIGURATION: 'some/path/config.json',
-      GITHUB_EVENT_PATH: '/workspace/event.json',
-    });
+    mockGetInput.mockImplementation(
+      getCoreInputMock({
+        'author-name': 'Rob Schneider',
+        'author-email': 'rschneider@github.com',
+        'commit-message': '[skip ci]: Automated version bump {version}',
+        configuration: 'some/path/config.json',
+      })
+    );
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
         bump_types: [
@@ -106,8 +124,8 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Michael Collins'"],
-        ["git config --local user.email 'mcollins@github.com'"],
+        ["git config --local user.name 'Rob Schneider'"],
+        ["git config --local user.email 'rschneider@github.com'"],
         ['git add ./package.json'],
         ['git commit -m "[skip ci]: Automated version bump 2.0.0"'],
         ['git push'],
@@ -115,20 +133,22 @@ describe('main', () => {
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
       expect(mockLog.mock.calls).toEqual([
-        ["Found label match: 'breaking'; for bump type: 'major'"],
-        ["Using bump type: 'major'"],
+        ['Found label match: breaking; for bump type: major'],
+        ['Using bump type: major'],
       ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(3);
+      expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '2.0.0']]);
     }
   });
   it('bumps the version using the default bump type', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-NAME': 'Michael Collins',
-      'INPUT_AUTHOR-EMAIL': 'mcollins@github.com',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      'INPUT_DEFAULT-BUMP-TYPE': 'patch',
-      GITHUB_EVENT_PATH: '/workspace/event.json',
-    });
+    mockGetInput.mockImplementation(
+      getCoreInputMock({
+        'author-name': 'Rob Schneider',
+        'author-email': 'rschneider@github.com',
+        'commit-message': '[skip ci]: Automated version bump {version}',
+        'default-bump-type': 'patch',
+      })
+    );
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
         pull_request: {
@@ -146,8 +166,8 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Michael Collins'"],
-        ["git config --local user.email 'mcollins@github.com'"],
+        ["git config --local user.name 'Rob Schneider'"],
+        ["git config --local user.email 'rschneider@github.com'"],
         ['git add ./package.json'],
         ['git commit -m "[skip ci]: Automated version bump 1.2.4"'],
         ['git push'],
@@ -155,20 +175,22 @@ describe('main', () => {
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
       expect(mockLog.mock.calls).toEqual([
-        ["No matches found; using default bump type: 'patch'"],
-        ["Using bump type: 'patch'"],
+        ['No matches found; using default bump type: patch'],
+        ['Using bump type: patch'],
       ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
+      expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.2.4']]);
     }
   });
   it('exits when the there is no associated pull request', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-NAME': 'Neil Armstrong',
-      'INPUT_AUTHOR-EMAIL': 'narmstrong@github.com',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      'INPUT_KEYWORDS-MINOR': 'feat',
-      GITHUB_EVENT_PATH: '/workspace/event.json',
-    });
+    mockGetInput.mockImplementation(
+      getCoreInputMock({
+        'author-name': 'Rob Schneider',
+        'author-email': 'rschneider@github.com',
+        'commit-message': '[skip ci]: Automated version bump {version}',
+        'default-bump-type': 'patch',
+      })
+    );
     mockReadFileSync.mockReturnValueOnce(getFileBuffer({ pull_request: null }));
     try {
       await run();
@@ -178,8 +200,8 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Neil Armstrong'"],
-        ["git config --local user.email 'narmstrong@github.com'"],
+        ["git config --local user.name 'Rob Schneider'"],
+        ["git config --local user.email 'rschneider@github.com'"],
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(1);
       expect(mockExitFailure).toHaveBeenCalledWith(
@@ -190,12 +212,14 @@ describe('main', () => {
     }
   });
   it('exits when the package.json version is invalid', async () => {
-    setActionVars({
-      'INPUT_AUTHOR-NAME': 'Buzz Aldrin',
-      'INPUT_AUTHOR-EMAIL': 'baldrin@github.com',
-      'INPUT_COMMIT-MESSAGE': '[skip ci]: Automated version bump {version}',
-      'INPUT_KEYWORDS-MINOR': 'feat',
-    });
+    mockGetInput.mockImplementation(
+      getCoreInputMock({
+        'author-name': 'Rob Schneider',
+        'author-email': 'rschneider@github.com',
+        'commit-message': '[skip ci]: Automated version bump {version}',
+        'default-bump-type': 'feat',
+      })
+    );
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
         pull_request: {
@@ -211,10 +235,12 @@ describe('main', () => {
       // if not, this next line will fail the test
       expect('the answer to life the universe and everything').toEqual(42);
     } catch (e) {
-      expect(mockExitFailure).toHaveBeenCalledTimes(1);
-      expect(mockExitFailure).toHaveBeenCalledWith(
-        'Action failed; with error: AssertionError [ERR_ASSERTION]: Invalid package.json version'
-      );
+      expect(mockExitFailure.mock.calls).toEqual([
+        [
+          'Could not construct PackageReader; with error: AssertionError [ERR_ASSERTION]: Invalid package version: a.b.c',
+        ],
+        ['Action failed; with error: Error'],
+      ]);
       expect(mockExitSuccess).toHaveBeenCalledTimes(0);
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }
