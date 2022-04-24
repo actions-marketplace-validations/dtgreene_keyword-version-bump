@@ -1,58 +1,50 @@
-# Bump and Tag V1
+# Auto Bumper
 
-This action bumps a project's `package.json` version and creates a corresponding tag on the default branch.
+This action bumps and commits a project's `package.json` version using the [Semantic Versioning system](https://semver.org/)
 
-Currently the action relies on being triggered by a pull request and searches the pull request's title for keyword matches.
+Currently the action relies on being triggered by an event related to a pull request.  Each bump type can be configured with both keywords and labels as triggers.  For each bump type, a match is determined by either a keyword being found in the pull request's title or a label matching one of the pull request's labels.
 
-[Webhook payload example](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#webhook-payload-example)
+Bump type labels can only be specified when using an external configuration file.  Configuration options in the external file will over-ride any options found in the workflow yaml.
 
 # Usage
 
 <!-- start usage -->
 ```yaml
-- uses: 'shipt/bump-and-tag@v1'
+- uses: 'dtgreene/actions-auto-bumper@v1'
   with:
     # Case-sensitive, comma-separated list of words that trigger a major version bump.
-    # Compared against the workflow event's pull request title.
-    # Default: 'MAJOR'
+    # Default: ''
     keywords-major: ''
     # Case-sensitive, comma-separated list of words that trigger a minor version bump.
-    # Compared against the workflow event's pull request title.
-    # Default: 'feat'
+    # Default: ''
     keywords-minor: ''
     # Case-sensitive, comma-separated list of words that trigger a patch version bump.
-    # Compared against the workflow event's pull request title.
-    # Default: 'patch,fix,bug'
+    # Default: ''
     keywords-patch: ''
+    # The default bump type used when no bump type can be determined by searching.
+    # If left blank, and no bump type can be determined, the action will exit without bumping.
+    # Default: ''
+    default-bump-type: ''
     # The author name used when making commits on behalf of the action.
-    # Default: 'Bump and tag action'
+    # Default: ''
     author-name: ''
     # The author email used when making commits on behalf of the action.
-    # Default: 'bump-and-tag-action@noreply.github.com'
+    # Default: ''
     author-email: ''
-    # The bump type to use when no words are matched with the workflow event's pull request title.
-    # If left blank, and no bump type can be determined, the action will exit.
-    # Default: 'patch'
-    default-bump-type: ''
-    # Case-sensitive, comma-separated list of allowed bump types.
-    # If the determined bump type is not in this list, the action will exit.
-    # Default: 'major,minor,patch'
-    allowed-bump-types: ''
-    # If the latest tag is newer after bumping the package version, this flag indicates whether to sync with the tag and perform the bump again.  Otherwise, the action will exit.
-    # Default: false
-    sync-package-tag: ''
+    # The commit message to use when bumping the version. {version} will be replaced with the new version.
+    # https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci/
+    # Default: '[skip ci]: Automated version bump {version}'
+    commit-message: ''
 ```
 <!-- end usage -->
 
-# Workflow example
+# Workflow examples
 
-Intended to be used with [actions/checkout@v3](https://github.com/actions/checkout) to checkout the repo and setup the proper authentication for committing.
+This action relies on [actions/checkout](https://github.com/actions/checkout/) setting up the repo with the correct authentication.
 
-In order for the checkout action to properly setup ssh, the `ssh-key` property needs to be supplied through one of the repo's action secrets.  The ssh key will need to belong to a user with permission to commit directly to the default branch (usually an admin if branch protection is enabled).
-
-<!-- start usage -->
+<!-- start workflow1 -->
 ```yaml
-name: 'Push Tag'
+name: 'Bump Version'
 
 on:
   pull_request:
@@ -61,25 +53,73 @@ on:
     types: [closed]
 
 jobs:
-  bump_and_tag:
-    name: Bump and Tag
+  bump_version:
+    name: Bump Version
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.merged }}
     env: 
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: 'Checkout source code'
+      - name: 'Checkout Repo'
         uses: 'actions/checkout@v3'
         with:
           persist-credentials: true
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
-      - name: 'Bump version and create tag'
+      - name: 'Bump Version'
         id: version-bump
-        uses: 'shipt/bump-and-tag@v1'
+        uses: 'dtgreene/actions-auto-bumper@v1'
         with:
-          wording-major: 'MAJOR'
-          wording-minor: 'feat'
-          wording-patch: 'patch,fix,bug'
+          author-name: 'Billy Bob'
+          author-email: 'bbob@email.com'
+          keywords-major: ''
+          keywords-minor: 'feat'
+          keywords-patch: 'fix,bug'
+          default-bump-type: 'minor'
 ```
-<!-- end usage -->
+<!-- end workflow1 -->
+
+All of the configuration options available in the workflow yaml can be configured through an external json file.
+
+<!-- start workflow2 -->
+```yaml
+- name: 'Bump Version'
+  id: version-bump
+  uses: 'dtgreene/actions-auto-bumper@v1'
+  with:
+    configuration: 'workflow/path/auto-bumper.config.json'
+```
+<!-- end workflow2 -->
+
+# External configuration file
+
+<!-- start config -->
+```json
+{
+  "bump_types": [
+    {
+      "type": "major",
+      "keywords": [],
+      "labels": []
+    },
+    {
+      "type": "minor",
+      "keywords": ["feat"],
+      "labels": ["feature", "enhancement"]
+    },
+    {
+      "type": "patch",
+      "keywords": ["patch", "fix", "bug"],
+      "labels": ["bug"]
+    }
+  ],
+  "default_bump_type": "patch",
+  "author": {
+    "name": "Billy Bob",
+    "email": "bbob@email.com"
+  },
+  "commit_message": "[skip ci]: Automated version bump {version}"
+}
+```
+<!-- end config -->
+
