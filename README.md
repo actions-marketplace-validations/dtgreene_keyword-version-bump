@@ -68,7 +68,7 @@ jobs:
           persist-credentials: true
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
-      - name: 'Bump Version'
+      - name: 'Auto Bumper'
         uses: 'dtgreene/actions-auto-bumper@v1'
         with:
           author-name: 'Billy Bob'
