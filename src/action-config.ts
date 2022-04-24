@@ -1,5 +1,6 @@
 import * as assert from 'assert';
-import { exitFailure, getInputList, getInputVar, getJson } from './utils';
+import * as core from '@actions/core';
+import { exitFailure, loadJson } from './utils';
 
 type BumpType = {
   type: string;
@@ -25,29 +26,29 @@ export class ActionConfig {
     this.bumpTypes = [
       {
         type: 'major',
-        keywords: getInputList('keywords-major'),
+        keywords: core.getInput('keywords-major').split(','),
         labels: [],
       },
       {
         type: 'minor',
-        keywords: getInputList('keywords-minor'),
+        keywords: core.getInput('keywords-minor').split(','),
         labels: [],
       },
       {
         type: 'patch',
-        keywords: getInputList('keywords-patch'),
+        keywords: core.getInput('keywords-patch').split(','),
         labels: [],
       },
     ];
-    this.defaultBumpType = getInputVar('default-bump-type');
-    this.commitMessage = getInputVar('commit-message');
+    this.defaultBumpType = core.getInput('default-bump-type');
+    this.commitMessage = core.getInput('commit-message');
     this.author = {
-      name: getInputVar('author-name'),
-      email: getInputVar('author-email'),
+      name: core.getInput('author-name'),
+      email: core.getInput('author-email'),
     };
-    const configPath = getInputVar('configuration');
+    const configPath = core.getInput('configuration');
     if (configPath) {
-      const configJson = getJson(configPath);
+      const configJson = loadJson(configPath);
       // keywords
       if (configJson.bump_types) {
         // remove existing bump types that are defined in the configuration file
@@ -87,12 +88,13 @@ export class ActionConfig {
         ({ keywords, labels }) => keywords.length > 0 || labels.length > 0
       );
 
-    // verify we have the required configuration
+    // verify the config at least has a commit message and either bump types or a default bump type
     try {
       assert.ok(this.commitMessage, 'Commit message is undefined');
-      if (this.bumpTypes.length === 0 && !this.defaultBumpType) {
-        throw new Error('No bump types found and no default bump type given');
-      }
+      assert.ok(
+        this.bumpTypes.length !== 0 || this.defaultBumpType,
+        'No bump types found and no default bump type given'
+      );
     } catch (e) {
       exitFailure(`Configuration is invalid; with error: ${e}`);
     }

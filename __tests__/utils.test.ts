@@ -1,70 +1,70 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import {
-  execute,
-  exitFailure,
+  getEnv,
+  loadJson,
+  saveJson,
   exitSuccess,
-  getInputVar,
-  getInputList,
-  getJson,
-  getGithubVar,
+  exitFailure,
+  execute,
 } from '../src/utils';
-import { resetActionVars, setActionVars, getFileBuffer } from './test-utils';
+import { getFileBuffer, resetEnv, setEnv } from './test-utils';
 
 const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
   throw new Error();
 });
 const mockReadFileSync = fs.readFileSync as jest.Mock;
+const mockWriteFileSync = fs.writeFileSync as jest.Mock;
 const mockExecSync = execSync as jest.Mock;
 jest.mock('child_process');
 jest.mock('fs');
 
 describe('utils', () => {
   afterEach(() => {
-    resetActionVars();
+    resetEnv();
   });
-  it('getJson', () => {
+  it('loadJson', () => {
     mockReadFileSync.mockReturnValueOnce(getFileBuffer({ version: '1.2.3' }));
-    expect(getJson('some/file/path')).toEqual({ version: '1.2.3' });
+    expect(loadJson('some/file/path')).toEqual({ version: '1.2.3' });
   });
-  it('getJson, exits when file cannot be read', () => {
+  it('loadJson, exits when file cannot be read', () => {
     mockReadFileSync.mockReturnValueOnce(Buffer.from(''));
-    expect(() => getJson('some/file/path')).toThrow();
+    expect(() => loadJson('some/file/path')).toThrow();
   });
-  it('getInputList', () => {
-    setActionVars({ 'INPUT_TEST-KEY': 'apples,oranges,grapes' });
-    expect(getInputList('test-key')).toEqual(['apples', 'oranges', 'grapes']);
+  it('saveJson', () => {
+    expect(() => {
+      saveJson('some/file/path', '');
+    }).not.toThrow();
   });
-  it('getInputVar', () => {
-    setActionVars({ 'INPUT_TEST-KEY': 'pizza' });
-    expect(getInputVar('test-key')).toEqual('pizza');
+  it('saveJson, exits when file cannot be saved', () => {
+    mockWriteFileSync.mockImplementationOnce(() => {
+      throw new Error();
+    });
+    expect(() => saveJson('some/file/path', '')).toThrow();
   });
-  it('getInputVar, exits when var not found', () => {
-    expect(() => getInputVar('krabby-patty-secret-formula')).toThrow();
+  it('getEnv', () => {
+    setEnv({ TESTING_123: 'pizza' });
+    expect(getEnv('TESTING_123')).toEqual('pizza');
   });
-  it('getGithubVar', () => {
-    setActionVars({ 'GITHUB_TEST-KEY': 'Bump and Tag' });
-    expect(getGithubVar('test-key')).toEqual('Bump and Tag');
-  });
-  it('getGithubVar, exits when var not found', () => {
-    expect(() => getGithubVar('krabby-patty-secret-formula')).toThrow();
+  it('getEnv, exits when var not found', () => {
+    expect(() => getEnv('KRABBY_PATTY_SECRET_FORMULA')).toThrow();
   });
   it('exitSuccess', () => {
     expect(() => {
-      exitSuccess();
+      exitSuccess('Action success');
     }).toThrow();
     expect(mockExit).toHaveBeenCalledTimes(1);
     expect(mockExit).toHaveBeenCalledWith(0);
   });
   it('exitFailure', () => {
     expect(() => {
-      exitFailure();
+      exitFailure('Something bad happened');
     }).toThrow();
     expect(mockExit).toHaveBeenCalledTimes(1);
     expect(mockExit).toHaveBeenCalledWith(1);
   });
   it('execute', () => {
-    setActionVars({ GITHUB_WORKSPACE: 'workspace/123' });
+    setEnv({ GITHUB_WORKSPACE: 'workspace/123' });
     execute('ls');
     expect(mockExecSync.mock.calls[0][0]).toEqual('ls');
   });
