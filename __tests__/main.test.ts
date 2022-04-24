@@ -8,15 +8,16 @@ const mockExitFailure = jest.fn().mockImplementation(() => {
 });
 const mockExitSuccess = jest.fn();
 const mockExecute = jest.fn();
-const mockLogInfo = jest.fn();
+const mockLog = jest.fn();
 
 jest.mock('../src/utils', () => ({
   ...(jest.requireActual('../src/utils') as object),
   exitFailure: (message?: string) => mockExitFailure(message),
   exitSuccess: () => mockExitSuccess(),
   execute: (command: string) => mockExecute(command),
-  log: {
-    info: (message?: any) => mockLogInfo(message),
+  logger: {
+    info: (message?: any) => mockLog(message),
+    special: (message?: any) => mockLog(message),
   },
 }));
 jest.mock('child_process');
@@ -61,7 +62,7 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLogInfo).toHaveBeenCalledWith('🔍 Matched keyword: feat');
+      expect(mockLog).toHaveBeenCalledWith('Matched keyword: feat in title: feat: A cool feature');
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }
   });
@@ -109,7 +110,7 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLogInfo).toHaveBeenCalledWith('🔍 Matched label: breaking');
+      expect(mockLog).toHaveBeenCalledWith('Matched label: breaking');
       expect(mockReadFileSync).toHaveBeenCalledTimes(3);
     }
   });
@@ -146,8 +147,8 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLogInfo).toHaveBeenCalledWith(
-        '🙈 No match found; using default bump type: patch'
+      expect(mockLog).toHaveBeenCalledWith(
+        'No matches found; using default bump type: patch'
       );
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }

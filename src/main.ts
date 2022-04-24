@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as semver from 'semver';
 import * as jsonfile from 'jsonfile';
 import {
-  log,
+  logger,
   execute,
   exitFailure,
   exitSuccess,
@@ -41,7 +41,7 @@ export async function run() {
     );
 
     // eventJson.head_commit.message
-    // potentially fallback to looking at the head commit message if no pull_request
+    // tood: fallback to looking at the head_commit message if no pull_request
 
     // get the package.json
     const packagePath = path.join(getGithubVar('workspace'), 'package.json');
@@ -68,10 +68,10 @@ export async function run() {
       `git commit -m "${getCommitMessage(config.commitMessage, bumpedVersion)}"`
     );
     execute('git push');
+    exitSuccess(`Bumped version from ${currentVersion} to ${bumpedVersion}`);
   } catch (e) {
     exitFailure(`Action failed; with error: ${e}`);
   }
-  exitSuccess();
 }
 
 function getCommitMessage(message: string, version: string) {
@@ -83,28 +83,33 @@ function getBumpType(config: ActionConfig, pullRequest: PullRequest) {
 
   for (let i = 0; i < config.bumpTypes.length; i++) {
     const { type, keywords, labels } = config.bumpTypes[i];
+
+    // check the keywords
     const matchedKeyword = keywords.find((word) =>
       pullRequest.title.includes(word)
     );
+    if (matchedKeyword) {
+      logger.special(
+        `Matched keyword: ${matchedKeyword} in title: ${pullRequest.title}`
+      );
+      matchResult = type;
+      break;
+    }
+
+    // check the labels
     const matchedLabel = labels.find((word) =>
       pullRequest.labels.includes(word)
     );
-
-    if (matchedKeyword) {
-      log.info(`🔍 Matched keyword: ${matchedKeyword}`);
-    } else if (matchedLabel) {
-      log.info(`🔍 Matched label: ${matchedLabel}`);
-    }
-
-    if (matchedKeyword || matchedLabel) {
+    if (matchedLabel) {
+      logger.special(`Matched label: ${matchedLabel}`);
       matchResult = type;
       break;
     }
   }
 
   if (!matchResult) {
-    log.info(
-      `🙈 No match found; using default bump type: ${config.defaultBumpType}`
+    logger.special(
+      `No matches found; using default bump type: ${config.defaultBumpType}`
     );
     matchResult = config.defaultBumpType;
   }

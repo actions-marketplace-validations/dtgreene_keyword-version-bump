@@ -1,16 +1,16 @@
+import * as c from 'ansi-colors';
 import * as assert from 'assert';
 import * as jsonfile from 'jsonfile';
 import { execSync } from 'child_process';
 
 const workingDirectory = process.env['GITHUB_WORKSPACE'];
 
-// https://github.com/Automattic/util-inspect/blob/master/index.js
-export const log = {
-  default: (message: string) => console.log(message),
-  info: (message: string) => logWithStyle(message, [34, 39]), // blue
-  warn: (message: string) => logWithStyle(message, [33, 39]), // yellow
-  error: (message: string) => logWithStyle(message, [31, 39]), // red
-  success: (message: string) => logWithStyle(message, [32, 39]), // green
+export const logger = {
+  info: (message: string) => console.log(c.cyan(message)),
+  warn: (message: string) => console.log(c.yellow(message)),
+  error: (message: string) => console.log(c.red(message)),
+  success: (message: string) => console.log(c.bgGreen(message)),
+  special: (message: string) => console.log(c.magenta(message)),
 };
 
 export function getJson(filePath: string) {
@@ -47,22 +47,22 @@ function getVar(key: string) {
 
 export function exitSuccess(message?: string): never {
   if (message) {
-    log.success(message);
+    logger.success(message);
   }
-  log.success('✔ success - exiting');
+  logger.success('✔ success - exiting');
   return process.exit(0);
 }
 
 export function exitFailure(message?: string): never {
   if (message) {
-    log.error(message);
+    logger.error(message);
   }
-  log.error('✖ failure - exiting');
+  logger.error('✖ failure - exiting');
   return process.exit(1);
 }
 
 export function execute(command: string) {
-  log.info(command);
+  logger.info(command);
   try {
     // setting stdio to pipe will prevent default logging of stdout
     return execSync(command, { cwd: workingDirectory, stdio: 'pipe' });
@@ -71,9 +71,9 @@ export function execute(command: string) {
   }
 }
 
-function logWithStyle(message: string, style: number[]) {
-  if (style) {
-    console.log(`\u001b[${style[0]}m${message}\u001b[${style[1]}m`);
+function logWithColor(message?: string, color?: number[]) {
+  if (color) {
+    console.log(`\u001b[${color[0]}m${message}\u001b[${color[1]}m`);
   } else {
     console.log(message);
   }
