@@ -38,9 +38,11 @@ Bump type labels can only be specified when using an external configuration file
 ```
 <!-- end usage -->
 
-# Workflow examples
+# Workflow example
 
 This action relies on [actions/checkout](https://github.com/actions/checkout/) setting up the repo with the correct authentication.
+
+### example-auto-bumper.yml
 
 <!-- start workflow1 -->
 ```yaml
@@ -79,7 +81,11 @@ jobs:
 ```
 <!-- end workflow1 -->
 
+# External configuration file
+
 All of the configuration options available in the workflow yaml can be configured through an external json file.  Configuration options in the external file will over-ride any options found in the workflow yaml.
+
+### example-auto-bumper.yml
 
 <!-- start workflow2 -->
 ```yaml
@@ -91,7 +97,7 @@ All of the configuration options available in the workflow yaml can be configure
 ```
 <!-- end workflow2 -->
 
-# External configuration file
+### auto-bumper.config.json
 
 <!-- start config -->
 ```json
@@ -122,4 +128,3 @@ All of the configuration options available in the workflow yaml can be configure
 }
 ```
 <!-- end config -->
-
