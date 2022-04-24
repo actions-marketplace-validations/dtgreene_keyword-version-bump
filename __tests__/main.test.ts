@@ -38,11 +38,9 @@ describe('main', () => {
     });
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        event: {
-          pull_request: {
-            title: 'feat: A cool feature',
-            labels: [],
-          },
+        pull_request: {
+          title: 'feat: A cool feature',
+          labels: [],
         },
       })
     );
@@ -88,11 +86,9 @@ describe('main', () => {
     );
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        event: {
-          pull_request: {
-            title: 'My pull request',
-            labels: ['breaking'],
-          },
+        pull_request: {
+          title: 'My pull request',
+          labels: ['breaking'],
         },
       })
     );
@@ -127,11 +123,9 @@ describe('main', () => {
     });
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        event: {
-          pull_request: {
-            title: 'My pull request',
-            labels: [],
-          },
+        pull_request: {
+          title: 'My pull request',
+          labels: [],
         },
       })
     );
@@ -166,13 +160,7 @@ describe('main', () => {
       'INPUT_KEYWORDS-MINOR': 'feat',
       GITHUB_EVENT_PATH: '/workspace/event.json',
     });
-    mockReadFileSync.mockReturnValueOnce(
-      getFileBuffer({
-        event: {
-          pull_request: null,
-        },
-      })
-    );
+    mockReadFileSync.mockReturnValueOnce(getFileBuffer({ pull_request: null }));
     try {
       await run();
       // the above line will "throw" when process.exit is called
@@ -201,11 +189,9 @@ describe('main', () => {
     });
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        event: {
-          pull_request: {
-            title: 'feat: A cool feature',
-            labels: ['enhancement'],
-          },
+        pull_request: {
+          title: 'feat: A cool feature',
+          labels: ['enhancement'],
         },
       })
     );
