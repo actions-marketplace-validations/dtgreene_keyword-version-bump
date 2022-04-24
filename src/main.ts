@@ -12,13 +12,16 @@ import {
 } from './utils';
 import { ActionConfig } from './action-config';
 
-type WebhookPayload = {
-  pull_request: PullRequest;
-};
-
 type PullRequest = {
   title: string;
   labels: string[];
+};
+
+type WebhookPayload = {
+  pull_request: PullRequest;
+  head_commit: {
+    message: string;
+  };
 };
 
 export async function run() {
@@ -36,6 +39,10 @@ export async function run() {
       eventJson.pull_request,
       'This event has no associated pull request'
     );
+
+    // eventJson.head_commit.message
+    // potentially fallback to looking at the head commit message if no pull_request
+
     // get the package.json
     const packagePath = path.join(getGithubVar('workspace'), 'package.json');
     const packageJson = getJson(packagePath);
