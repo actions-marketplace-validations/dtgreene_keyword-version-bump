@@ -17,6 +17,7 @@ jest.mock('../src/utils', () => ({
   execute: (command: string) => mockExecute(command),
   logger: {
     info: (message?: any) => mockLog(message),
+    warn: (message?: any) => mockLog(message),
     success: (message?: any) => mockLog(message),
   },
 }));
@@ -62,7 +63,10 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLog).toHaveBeenCalledWith('Matched keyword: feat in title: feat: A cool feature');
+      expect(mockLog.mock.calls).toEqual([
+        ["Found keyword match: 'feat'; for bump type: 'minor'"],
+        ["Using bump type: 'minor'"],
+      ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }
   });
@@ -110,7 +114,10 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLog).toHaveBeenCalledWith('Matched label: breaking');
+      expect(mockLog.mock.calls).toEqual([
+        ["Found label match: 'breaking'; for bump type: 'major'"],
+        ["Using bump type: 'major'"],
+      ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(3);
     }
   });
@@ -147,9 +154,10 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLog).toHaveBeenCalledWith(
-        'No matches found; using default bump type: patch'
-      );
+      expect(mockLog.mock.calls).toEqual([
+        ["No matches found; using default bump type: 'patch'"],
+        ["Using bump type: 'patch'"],
+      ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }
   });

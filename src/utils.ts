@@ -9,7 +9,7 @@ export const logger = {
   info: (message: string) => console.log(c.cyan(message)),
   warn: (message: string) => console.log(c.yellow(message)),
   error: (message: string) => console.log(c.red(message)),
-  success: (message: string) => console.log(c.green(message))
+  success: (message: string) => console.log(c.green(message)),
 };
 
 export function getJson(filePath: string) {
@@ -48,7 +48,7 @@ export function exitSuccess(message?: string): never {
   if (message) {
     logger.success(message);
   }
-  logger.success('✔ success - exiting');
+  logger.success('Success ✔');
   return process.exit(0);
 }
 
@@ -56,7 +56,7 @@ export function exitFailure(message?: string): never {
   if (message) {
     logger.error(message);
   }
-  logger.error('✖ failure - exiting');
+  logger.error('Failure ✖');
   return process.exit(1);
 }
 

@@ -68,7 +68,7 @@ export async function run() {
       `git commit -m "${getCommitMessage(config.commitMessage, bumpedVersion)}"`
     );
     execute('git push');
-    exitSuccess(`Bumped version from ${currentVersion} to ${bumpedVersion}`);
+    exitSuccess(`Bumped version ${currentVersion} -> ${bumpedVersion}`);
   } catch (e) {
     exitFailure(`Action failed; with error: ${e}`);
   }
@@ -90,7 +90,7 @@ function getBumpType(config: ActionConfig, pullRequest: PullRequest) {
     );
     if (matchedKeyword) {
       logger.success(
-        `Matched keyword: ${matchedKeyword} in title: ${pullRequest.title}`
+        `Found keyword match: '${matchedKeyword}'; for bump type: '${type}'`
       );
       matchResult = type;
       break;
@@ -101,18 +101,18 @@ function getBumpType(config: ActionConfig, pullRequest: PullRequest) {
       pullRequest.labels.includes(word)
     );
     if (matchedLabel) {
-      logger.success(`Matched label: ${matchedLabel}`);
+      logger.success(
+        `Found label match: '${matchedLabel}'; for bump type: '${type}'`
+      );
       matchResult = type;
       break;
     }
   }
 
   if (!matchResult) {
-    logger.success(
-      `No matches found; using default bump type: ${config.defaultBumpType}`
-    );
     matchResult = config.defaultBumpType;
+    logger.warn(`No matches found; using default bump type: '${matchResult}'`);
   }
-
+  logger.success(`Using bump type: '${matchResult}'`);
   return matchResult;
 }
