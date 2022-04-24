@@ -33,7 +33,9 @@ export async function run() {
     // get the workflow event payload
     const eventPath = getGithubVar('event_path');
     const eventJson = getJson(eventPath) as WebhookPayload;
-    log.warn(getJson(eventPath));
+    Object.keys(getJson(eventPath)).forEach((key) => {
+      log.warn(key);
+    });
     // verify there is an associated pull request
     assert.ok(
       eventJson.event.pull_request,
