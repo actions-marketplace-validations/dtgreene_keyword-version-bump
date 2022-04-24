@@ -1,6 +1,6 @@
 # Auto Bumper
 
-This action bumps and commits a project's `package.json` version using the [Semantic Versioning system](https://semver.org/)
+This action bumps and commits an npm project's `package.json` version using the [Semantic Versioning system](https://semver.org/)
 
 Currently the action relies on being triggered by an event related to a pull request.  Each bump type can be configured with both keywords and labels as triggers.  For each bump type, a match is determined by either a keyword being found in the pull request's title or a label matching one of the pull request's labels.
 
