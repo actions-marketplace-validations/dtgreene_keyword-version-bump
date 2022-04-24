@@ -93,7 +93,7 @@ All of the configuration options available in the workflow yaml can be configure
   id: version-bump
   uses: 'dtgreene/actions-auto-bumper@v1'
   with:
-    configuration: 'workflow/path/auto-bumper.config.json'
+    configuration: '.github/workflows/auto-bumper.config.json'
 ```
 <!-- end workflow2 -->
 
