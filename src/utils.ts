@@ -9,8 +9,7 @@ export const logger = {
   info: (message: string) => console.log(c.cyan(message)),
   warn: (message: string) => console.log(c.yellow(message)),
   error: (message: string) => console.log(c.red(message)),
-  success: (message: string) => console.log(c.bgGreen(message)),
-  special: (message: string) => console.log(c.magenta(message)),
+  success: (message: string) => console.log(c.green(message))
 };
 
 export function getJson(filePath: string) {

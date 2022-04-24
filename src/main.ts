@@ -89,7 +89,7 @@ function getBumpType(config: ActionConfig, pullRequest: PullRequest) {
       pullRequest.title.includes(word)
     );
     if (matchedKeyword) {
-      logger.special(
+      logger.success(
         `Matched keyword: ${matchedKeyword} in title: ${pullRequest.title}`
       );
       matchResult = type;
@@ -101,14 +101,14 @@ function getBumpType(config: ActionConfig, pullRequest: PullRequest) {
       pullRequest.labels.includes(word)
     );
     if (matchedLabel) {
-      logger.special(`Matched label: ${matchedLabel}`);
+      logger.success(`Matched label: ${matchedLabel}`);
       matchResult = type;
       break;
     }
   }
 
   if (!matchResult) {
-    logger.special(
+    logger.success(
       `No matches found; using default bump type: ${config.defaultBumpType}`
     );
     matchResult = config.defaultBumpType;

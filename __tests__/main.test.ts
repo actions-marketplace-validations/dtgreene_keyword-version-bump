@@ -17,7 +17,7 @@ jest.mock('../src/utils', () => ({
   execute: (command: string) => mockExecute(command),
   logger: {
     info: (message?: any) => mockLog(message),
-    special: (message?: any) => mockLog(message),
+    success: (message?: any) => mockLog(message),
   },
 }));
 jest.mock('child_process');
