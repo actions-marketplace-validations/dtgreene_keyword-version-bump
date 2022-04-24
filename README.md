@@ -4,7 +4,7 @@ This action bumps and commits a project's `package.json` version using the [Sema
 
 Currently the action relies on being triggered by an event related to a pull request.  Each bump type can be configured with both keywords and labels as triggers.  For each bump type, a match is determined by either a keyword being found in the pull request's title or a label matching one of the pull request's labels.
 
-Bump type labels can only be specified when using an external configuration file.  Configuration options in the external file will over-ride any options found in the workflow yaml.
+Bump type labels can only be specified when using an external configuration file.
 
 # Usage
 
@@ -79,7 +79,7 @@ jobs:
 ```
 <!-- end workflow1 -->
 
-All of the configuration options available in the workflow yaml can be configured through an external json file.
+All of the configuration options available in the workflow yaml can be configured through an external json file.  Configuration options in the external file will over-ride any options found in the workflow yaml.
 
 <!-- start workflow2 -->
 ```yaml
