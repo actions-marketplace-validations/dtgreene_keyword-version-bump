@@ -1,0 +1,41 @@
+name: Bump and Tag
+description: Automatically bumps a projects version and creates a new tag
+runs:
+  using: node16
+  main: dist/index.js
+branding:
+  icon: chevron-up
+  color: blue
+inputs:
+  keywords-major:
+    description: 'Comma-separated, case-sensitive list of words that trigger a major version bump'
+    default: ''
+    required: false
+  keywords-minor:
+    description: 'Comma-separated, case-sensitive list of words that trigger a minor version bump'
+    default: ''
+    required: false
+  keywords-patch:
+    description: 'Comma-separated, case-sensitive list of words that trigger a patch version bump'
+    default: ''
+    required: false
+  default-bump-type:
+    description: 'The fallback bump type to use when keyword matching yields no results'
+    default: ''
+    required: false
+  author-name:
+    description: 'The authors name used when committing'
+    default: ''
+    required: false
+  author-email:
+    description: 'The authors email used when committing'
+    default: ''
+    required: false
+  commit-message:
+    description: 'The commit message of the version bump'
+    default: '[skip ci]: Automated version bump {version}'
+    required: false
+  configuration:
+    description: 'Path to a JSON configuration file'
+    default: ''
+    required: false

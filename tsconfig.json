@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "exclude": ["node_modules", "__tests__", "dist"]
+}
