@@ -13,7 +13,9 @@ import {
 import { ActionConfig } from './action-config';
 
 type WebhookPayload = {
-  pull_request: PullRequest;
+  event: {
+    pull_request: PullRequest;
+  };
 };
 
 type PullRequest = {
@@ -33,7 +35,7 @@ export async function run() {
     const eventJson = getJson(eventPath) as WebhookPayload;
     // verify there is an associated pull request
     assert.ok(
-      eventJson.pull_request,
+      eventJson.event.pull_request,
       'This event has no associated pull request'
     );
     // get the package.json
@@ -43,7 +45,7 @@ export async function run() {
     const currentVersion = semver.valid(packageJson.version);
     assert.ok(currentVersion, 'Invalid package.json version');
     // bump the version
-    const bumpType = getBumpType(config, eventJson.pull_request);
+    const bumpType = getBumpType(config, eventJson.event.pull_request);
     const bumpedVersion = semver.inc(
       currentVersion,
       bumpType as semver.ReleaseType

@@ -38,9 +38,11 @@ describe('main', () => {
     });
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        pull_request: {
-          title: 'feat: A cool feature',
-          labels: [],
+        event: {
+          pull_request: {
+            title: 'feat: A cool feature',
+            labels: [],
+          },
         },
       })
     );
@@ -86,9 +88,11 @@ describe('main', () => {
     );
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        pull_request: {
-          title: 'My pull request',
-          labels: ['breaking'],
+        event: {
+          pull_request: {
+            title: 'My pull request',
+            labels: ['breaking'],
+          },
         },
       })
     );
@@ -123,9 +127,11 @@ describe('main', () => {
     });
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        pull_request: {
-          title: 'My pull request',
-          labels: [],
+        event: {
+          pull_request: {
+            title: 'My pull request',
+            labels: [],
+          },
         },
       })
     );
@@ -146,7 +152,9 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
-      expect(mockLogInfo).toHaveBeenCalledWith('🙈 No match found; using default bump type: patch');
+      expect(mockLogInfo).toHaveBeenCalledWith(
+        '🙈 No match found; using default bump type: patch'
+      );
       expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }
   });
@@ -158,7 +166,13 @@ describe('main', () => {
       'INPUT_KEYWORDS-MINOR': 'feat',
       GITHUB_EVENT_PATH: '/workspace/event.json',
     });
-    mockReadFileSync.mockReturnValueOnce(getFileBuffer({ pull_request: null }));
+    mockReadFileSync.mockReturnValueOnce(
+      getFileBuffer({
+        event: {
+          pull_request: null,
+        },
+      })
+    );
     try {
       await run();
       // the above line will "throw" when process.exit is called
@@ -187,9 +201,11 @@ describe('main', () => {
     });
     mockReadFileSync.mockReturnValueOnce(
       getFileBuffer({
-        pull_request: {
-          title: 'feat: A cool feature',
-          labels: ['enhancement'],
+        event: {
+          pull_request: {
+            title: 'feat: A cool feature',
+            labels: ['enhancement'],
+          },
         },
       })
     );
