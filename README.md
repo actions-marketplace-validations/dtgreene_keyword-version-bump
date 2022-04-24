@@ -127,6 +127,6 @@ All of the configuration options available in the workflow yaml can be configure
 ```
 <!-- end config -->
 
-# Future
+# Future (todos)
 - Implement @actions/exec instead of child_process
 - Implement @actions/core for action input/output
