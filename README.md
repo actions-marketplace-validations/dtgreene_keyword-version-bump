@@ -130,3 +130,4 @@ All of the configuration options available in the workflow yaml can be configure
 # Future (todos)
 - Implement [@actions/exec](https://github.com/actions/toolkit/tree/main/packages/exec) for executing commands
 - Implement [@actions/core](https://github.com/actions/toolkit/tree/main/packages/core) for action input/output
+- Potentially perform keyword searches on the workflow event's `head_commit.message` instead of only the `pull_request.title`
