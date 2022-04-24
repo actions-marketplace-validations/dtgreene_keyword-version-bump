@@ -69,7 +69,6 @@ jobs:
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
       - name: 'Bump Version'
-        id: version-bump
         uses: 'dtgreene/actions-auto-bumper@v1'
         with:
           author-name: 'Billy Bob'
@@ -90,10 +89,9 @@ All of the configuration options available in the workflow yaml can be configure
 <!-- start workflow2 -->
 ```yaml
 - name: 'Bump Version'
-  id: version-bump
   uses: 'dtgreene/actions-auto-bumper@v1'
   with:
-    configuration: 'workflow/path/auto-bumper.config.json'
+    configuration: '.github/workflows/auto-bumper.config.json'
 ```
 <!-- end workflow2 -->
 
