@@ -1,16 +1,14 @@
-# Auto Bumper
+# Bump Version
 
-This action bumps and commits an npm project's `package.json` version using the [Semantic Versioning system](https://semver.org/)
+This action bumps and commits an npm project's `package.json` version using the [Semantic Versioning system](https://semver.org/). The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
 
-Currently the action relies on being triggered by an event related to a pull request.  Each bump type can be configured with both keywords and labels as triggers.  For each bump type, a match is determined by either a keyword being found in the pull request's title or a label matching one of the pull request's labels.
-
-Bump type labels can only be specified when using an external configuration file.
+This action was designed to work with pull request events since the pull request's title is used for matching keywords.
 
 # Usage
 
 <!-- start usage -->
 ```yaml
-- uses: 'dtgreene/actions-auto-bumper@v1'
+- uses: 'dtgreene/actions-bump-version@v1'
   with:
     # Case-sensitive, comma-separated list of words that trigger a major version bump.
     # Default: ''
@@ -41,11 +39,22 @@ Bump type labels can only be specified when using an external configuration file
 ```
 <!-- end usage -->
 
+The keywords for `major`, `minor`, and `patch` bump types can be configured via the workflow.  Keywords and labels as well as additional bump types can be configured when using an external configuration file.  
+
+The available bump types are:
+- `major`
+- `premajor`
+- `minor`
+- `preminor`
+- `patch`
+- `prepatch`
+- `prerelease`
+
 # Workflow example
 
 This action relies on [actions/checkout](https://github.com/actions/checkout/) for setting up the environment.
 
-### example-auto-bumper.yml
+### example-bump-workflow.yml
 
 <!-- start workflow1 -->
 ```yaml
@@ -71,8 +80,8 @@ jobs:
           persist-credentials: true
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
-      - name: 'Auto Bumper'
-        uses: 'dtgreene/actions-auto-bumper@v1'
+      - name: 'Bump Version'
+        uses: 'dtgreene/actions-bump-version@v1'
         with:
           author-name: 'Billy Bob'
           author-email: 'bbob@email.com'
@@ -87,18 +96,18 @@ jobs:
 
 All of the configuration options available in the workflow yaml can be configured through an external json file.  Configuration options in the external file will over-ride any options found in the workflow yaml.
 
-### example-auto-bumper.yml
+### example-bump-workflow.yml
 
 <!-- start workflow2 -->
 ```yaml
 - name: 'Bump Version'
-  uses: 'dtgreene/actions-auto-bumper@v1'
+  uses: 'dtgreene/actions-bump-version@v1'
   with:
-    configuration: '.github/workflows/auto-bumper.config.json'
+    configuration: '.github/workflows/bump-version.config.json'
 ```
 <!-- end workflow2 -->
 
-### auto-bumper.config.json
+### example-bump-workflow.yml
 
 <!-- start config -->
 ```json
