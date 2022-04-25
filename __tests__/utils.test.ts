@@ -10,13 +10,18 @@ import {
 } from '../src/utils';
 import { getFileBuffer, resetEnv, setEnv } from './test-utils';
 
+// mock child_process
+const mockExecSync = execSync as jest.Mock;
+jest.mock('child_process');
+
+// spy on process.exit
 const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
   throw new Error();
 });
+
+// mock fs
 const mockReadFileSync = fs.readFileSync as jest.Mock;
 const mockWriteFileSync = fs.writeFileSync as jest.Mock;
-const mockExecSync = execSync as jest.Mock;
-jest.mock('child_process');
 jest.mock('fs');
 
 describe('utils', () => {

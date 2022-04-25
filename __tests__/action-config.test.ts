@@ -3,9 +3,16 @@ import * as core from '@actions/core';
 import { ActionConfig } from '../src/action-config';
 import { getFileBuffer, getCoreInputMock } from './test-utils';
 
+// mock child_process
+jest.mock('child_process');
+
 // mock fs
 const mockReadFileSync = fs.readFileSync as jest.Mock;
 jest.mock('fs');
+
+// mock core
+const mockGetInput = core.getInput as jest.Mock;
+jest.mock('@actions/core');
 
 // mock utils
 const mockExitFailure = jest.fn().mockImplementation(() => {
@@ -15,13 +22,6 @@ jest.mock('../src/utils', () => ({
   ...(jest.requireActual('../src/utils') as object),
   exitFailure: (message?: string) => mockExitFailure(message),
 }));
-
-// mock child_process
-jest.mock('child_process');
-
-// mock core
-const mockGetInput = core.getInput as jest.Mock;
-jest.mock('@actions/core');
 
 describe('utils', () => {
   afterEach(() => {

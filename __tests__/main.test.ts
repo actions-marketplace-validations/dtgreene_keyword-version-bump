@@ -3,6 +3,18 @@ import * as core from '@actions/core';
 import { run } from '../src/main';
 import { getCoreInputMock, getFileBuffer } from './test-utils';
 
+// mock child_process
+jest.mock('child_process');
+
+// mock fs
+const mockReadFileSync = fs.readFileSync as jest.Mock;
+jest.mock('fs');
+
+// mock core
+const mockGetInput = core.getInput as jest.Mock;
+const mockSetOuput = core.setOutput as jest.Mock;
+jest.mock('@actions/core');
+
 // mock utils
 const mockExitFailure = jest.fn().mockImplementation(() => {
   throw new Error();
@@ -21,18 +33,6 @@ jest.mock('../src/utils', () => ({
     success: (message?: any) => mockLog(message),
   },
 }));
-
-// mock child_process
-jest.mock('child_process');
-
-// mock fs
-const mockReadFileSync = fs.readFileSync as jest.Mock;
-jest.mock('fs');
-
-// mock core
-const mockGetInput = core.getInput as jest.Mock;
-const mockSetOuput = core.setOutput as jest.Mock;
-jest.mock('@actions/core');
 
 const packageBuffer = getFileBuffer({ version: '1.2.3' });
 
@@ -209,40 +209,6 @@ describe('main', () => {
       );
       expect(mockExitSuccess).toHaveBeenCalledTimes(0);
       expect(mockReadFileSync).toHaveBeenCalledTimes(1);
-    }
-  });
-  it('exits when the package.json version is invalid', async () => {
-    mockGetInput.mockImplementation(
-      getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
-        'commit-message': '[skip ci]: Automated version bump {version}',
-        'default-bump-type': 'feat',
-      })
-    );
-    mockReadFileSync.mockReturnValueOnce(
-      getFileBuffer({
-        pull_request: {
-          title: 'feat: A cool feature',
-          labels: ['enhancement'],
-        },
-      })
-    );
-    mockReadFileSync.mockReturnValueOnce(getFileBuffer({ version: 'a.b.c' }));
-    try {
-      await run();
-      // the above line will "throw" when process.exit is called
-      // if not, this next line will fail the test
-      expect('the answer to life the universe and everything').toEqual(42);
-    } catch (e) {
-      expect(mockExitFailure.mock.calls).toEqual([
-        [
-          'Could not construct PackageReader; with error: AssertionError [ERR_ASSERTION]: Invalid package version: a.b.c',
-        ],
-        ['Action failed; with error: Error'],
-      ]);
-      expect(mockExitSuccess).toHaveBeenCalledTimes(0);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(2);
     }
   });
 });
