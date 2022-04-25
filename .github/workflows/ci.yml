@@ -43,7 +43,7 @@ jobs:
       
       # Commit if build is different
       - name: Commit Build
-        if: ${{ env.HAS_CHANGES == true }}
+        if: ${{ env.HAS_CHANGES == 'true' }}
         run: |
           git config --local user.email "ciworkflow@github.fake"
           git config --local user.name "CI Workflow"
