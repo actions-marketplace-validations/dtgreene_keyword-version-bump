@@ -96,7 +96,7 @@ jobs:
         
       - name: Bump Version
         id: bump_version
-        uses: 'dtgreene/keyword-version-bump@main'
+        uses: 'dtgreene/keyword-version-bump@v1'
         with:
           search-target: ${{ github.event.pull_request.title }}
           configuration: '.github/workflows/bump-version.config.json'
@@ -112,7 +112,7 @@ All of the configuration options besides the `search-target` can be configured t
 <!-- start workflow2 -->
 ```yaml
 - name: Bump Version
-  uses: 'dtgreene/keyword-version-bump@main'
+  uses: 'dtgreene/keyword-version-bump@v1'
   with:
     search-target: ${{ github.event.pull_request.title }}
     configuration: '.github/workflows/version-bump.config.json'
