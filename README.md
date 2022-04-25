@@ -35,6 +35,9 @@ Bump type labels can only be specified when using an external configuration file
     # https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci/
     # Default: '[skip ci]: Automated version bump {version}'
     commit-message: ''
+    # Path to an external json configuration file
+    # Default: ''
+    configuration: ''
 ```
 <!-- end usage -->
 
