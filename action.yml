@@ -7,6 +7,9 @@ branding:
   icon: chevron-up
   color: blue
 inputs:
+  search-target: 
+    description: 'The target word used for searching'
+    required: true
   keywords-major:
     description: 'Comma-separated, case-sensitive list of words that trigger a major version bump'
     default: ''
@@ -21,14 +24,6 @@ inputs:
     required: false
   default-bump-type:
     description: 'The fallback bump type to use when keyword matching yields no results'
-    default: ''
-    required: false
-  author-name:
-    description: 'The authors name used when committing'
-    default: ''
-    required: false
-  author-email:
-    description: 'The authors email used when committing'
     default: ''
     required: false
   commit-message:

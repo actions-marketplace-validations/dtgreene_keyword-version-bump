@@ -1,8 +1,6 @@
 # Bump Version
 
-This action bumps and commits an npm project's `package.json` version using the [Semantic Versioning system](https://semver.org/). The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
-
-This action was designed to work with pull request events as the trigger since the pull request's title is used for matching keywords.
+This action bumps and commits an node project's version using the [Semantic Versioning system](https://semver.org/). The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
 
 # Usage
 
@@ -10,6 +8,8 @@ This action was designed to work with pull request events as the trigger since t
 ```yaml
 - uses: 'dtgreene/actions-bump-version@v1'
   with:
+    # The target word used for searching for keywords.
+    search-target: ''
     # Case-sensitive, comma-separated list of words that trigger a major version bump.
     # Default: ''
     keywords-major: ''
@@ -23,12 +23,6 @@ This action was designed to work with pull request events as the trigger since t
     # If left blank, and no bump type can be determined, the action will exit without bumping.
     # Default: ''
     default-bump-type: ''
-    # The author name used when making commits on behalf of the action.
-    # Default: ''
-    author-name: ''
-    # The author email used when making commits on behalf of the action.
-    # Default: ''
-    author-email: ''
     # The commit message to use when bumping the version. {version} will be replaced with the new version.
     # https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci/
     # Default: '[skip ci]: Automated version bump {version}'
@@ -39,7 +33,7 @@ This action was designed to work with pull request events as the trigger since t
 ```
 <!-- end usage -->
 
-The keywords for `major`, `minor`, and `patch` bump types can be configured via the workflow.  Keywords and labels as well as additional bump types can be configured when using an external configuration file.  
+The keywords for `major`, `minor`, and `patch` bump types can be configured via the workflow.  Additional bump types can be configured when using an external configuration file.  
 
 The available bump types are:
 - `major`
@@ -80,11 +74,14 @@ jobs:
           persist-credentials: true
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
+      - name: Setup Author
+        run: |
+          git config --local user.name 'Bump Version'
+          git config --local user.email 'bump-version@github.fake'
       - name: Bump Version
         uses: 'dtgreene/actions-bump-version@main'
         with:
-          author-name: 'Billy Bob'
-          author-email: 'bbob@email.com'
+          search-target: ${{ github.event.pull_request.title }}
           keywords-major: ''
           keywords-minor: 'feat'
           keywords-patch: 'fix,bug'
@@ -94,7 +91,7 @@ jobs:
 
 # External configuration file
 
-All of the configuration options available in the workflow yaml can be configured through an external json file.  Configuration options in the external file will over-ride any options found in the workflow yaml.
+All of the configuration options besides the `search-target` can be configured through an external json file.  Configuration options in the external file will over-ride any options given through the workflow yaml.
 
 ### example-bump-workflow.yml
 
@@ -103,6 +100,7 @@ All of the configuration options available in the workflow yaml can be configure
 - name: Bump Version
   uses: 'dtgreene/actions-bump-version@main'
   with:
+    search-target: ${{ github.event.pull_request.title }}
     configuration: '.github/workflows/bump-version.config.json'
 ```
 <!-- end workflow2 -->
@@ -116,17 +114,14 @@ All of the configuration options available in the workflow yaml can be configure
     {
       "type": "major",
       "keywords": [],
-      "labels": []
     },
     {
       "type": "minor",
       "keywords": ["feat"],
-      "labels": ["feature", "enhancement"]
     },
     {
       "type": "patch",
       "keywords": ["patch", "fix", "bug"],
-      "labels": ["bug"]
     }
   ],
   "default_bump_type": "patch",

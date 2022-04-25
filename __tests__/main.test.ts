@@ -24,7 +24,10 @@ const mockExecute = jest.fn();
 const mockLog = jest.fn();
 jest.mock('../src/utils', () => ({
   ...(jest.requireActual('../src/utils') as object),
-  exitFailure: (message?: string) => mockExitFailure(message),
+  exitFailure: (message?: string) => {
+    console.log(message);
+    mockExitFailure(message)
+  },
   exitSuccess: (message?: string) => mockExitSuccess(message),
   execute: (command: string) => mockExecute(command),
   logger: {
@@ -48,18 +51,9 @@ describe('main', () => {
   it('bumps the version according to the yaml configuration', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
+        'search-target': 'feat: A shiny new feature',
         'commit-message': '[skip ci]: Automated version bump {version}',
         'keywords-minor': 'feat',
-      })
-    );
-    mockReadFileSync.mockReturnValueOnce(
-      getFileBuffer({
-        pull_request: {
-          title: 'feat: A cool feature',
-          labels: [],
-        },
       })
     );
     mockReadFileSync.mockReturnValueOnce(packageBuffer);
@@ -71,8 +65,6 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Rob Schneider'"],
-        ["git config --local user.email 'rschneider@github.com'"],
         ['git add ./package.json'],
         ['git commit -m "[skip ci]: Automated version bump 1.3.0"'],
         ['git push'],
@@ -86,16 +78,14 @@ describe('main', () => {
         ['Found keyword match: feat; for bump type: minor'],
         ['Using bump type: minor'],
       ]);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(2);
+      expect(mockReadFileSync).toHaveBeenCalledTimes(1);
       expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.3.0']]);
     }
   });
   it('bumps the version according to the json configuration', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
-        'commit-message': '[skip ci]: Automated version bump {version}',
+        'search-target': 'BREAKING: A huge change',
         configuration: 'some/path/config.json',
       })
     );
@@ -104,18 +94,10 @@ describe('main', () => {
         bump_types: [
           {
             type: 'major',
-            keywords: [],
-            labels: ['breaking'],
+            keywords: ['BREAKING'],
           },
         ],
-      })
-    );
-    mockReadFileSync.mockReturnValueOnce(
-      getFileBuffer({
-        pull_request: {
-          title: 'My pull request',
-          labels: ['breaking'],
-        },
+        commit_message: '[skip ci]: Automated version bump {version}'
       })
     );
     mockReadFileSync.mockReturnValueOnce(packageBuffer);
@@ -127,8 +109,6 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Rob Schneider'"],
-        ["git config --local user.email 'rschneider@github.com'"],
         ['git add ./package.json'],
         ['git commit -m "[skip ci]: Automated version bump 2.0.0"'],
         ['git push'],
@@ -139,28 +119,19 @@ describe('main', () => {
         'Bumped version 1.2.3 -> 2.0.0'
       );
       expect(mockLog.mock.calls).toEqual([
-        ['Found label match: breaking; for bump type: major'],
+        ['Found keyword match: BREAKING; for bump type: major'],
         ['Using bump type: major'],
       ]);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(3);
+      expect(mockReadFileSync).toHaveBeenCalledTimes(2);
       expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '2.0.0']]);
     }
   });
   it('bumps the version using the default bump type', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
+        'search-target': 'feat: A shiny new feature',
         'commit-message': '[skip ci]: Automated version bump {version}',
         'default-bump-type': 'patch',
-      })
-    );
-    mockReadFileSync.mockReturnValueOnce(
-      getFileBuffer({
-        pull_request: {
-          title: 'My pull request',
-          labels: [],
-        },
       })
     );
     mockReadFileSync.mockReturnValueOnce(packageBuffer);
@@ -172,8 +143,6 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Rob Schneider'"],
-        ["git config --local user.email 'rschneider@github.com'"],
         ['git add ./package.json'],
         ['git commit -m "[skip ci]: Automated version bump 1.2.4"'],
         ['git push'],
@@ -187,37 +156,8 @@ describe('main', () => {
         ['No matches found; using default bump type: patch'],
         ['Using bump type: patch'],
       ]);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(2);
-      expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.2.4']]);
-    }
-  });
-  it('exits when the there is no associated pull request', async () => {
-    mockGetInput.mockImplementation(
-      getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
-        'commit-message': '[skip ci]: Automated version bump {version}',
-        'default-bump-type': 'patch',
-      })
-    );
-    mockReadFileSync.mockReturnValueOnce(getFileBuffer({ pull_request: null }));
-    try {
-      await run();
-      // the above line will "throw" when process.exit is called
-      // if not, this next line will fail the test
-      expect('the answer to life the universe and everything').toEqual(42);
-    } catch (e) {
-      // check execute commands
-      expect(mockExecute.mock.calls).toEqual([
-        ["git config --local user.name 'Rob Schneider'"],
-        ["git config --local user.email 'rschneider@github.com'"],
-      ]);
-      expect(mockExitFailure).toHaveBeenCalledTimes(1);
-      expect(mockExitFailure).toHaveBeenCalledWith(
-        'Action failed; with error: AssertionError [ERR_ASSERTION]: This event has no associated pull request'
-      );
-      expect(mockExitSuccess).toHaveBeenCalledTimes(0);
       expect(mockReadFileSync).toHaveBeenCalledTimes(1);
+      expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.2.4']]);
     }
   });
 });

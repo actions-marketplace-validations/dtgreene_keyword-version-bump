@@ -30,8 +30,6 @@ describe('utils', () => {
   it('parses the yaml configuration', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
         'commit-message': '[skip ci]: Automated version bump {version}',
         'keywords-major': 'MAJOR',
         'keywords-minor': 'feat',
@@ -41,24 +39,18 @@ describe('utils', () => {
     );
     const config = new ActionConfig();
     expect(config.bumpTypes).toEqual([
-      { type: 'major', keywords: ['MAJOR'], labels: [] },
-      { type: 'minor', keywords: ['feat'], labels: [] },
-      { type: 'patch', keywords: ['fix', 'bug'], labels: [] },
+      { type: 'major', keywords: ['MAJOR'] },
+      { type: 'minor', keywords: ['feat'] },
+      { type: 'patch', keywords: ['fix', 'bug'] },
     ]);
     expect(config.defaultBumpType).toEqual('patch');
     expect(config.commitMessage).toEqual(
       '[skip ci]: Automated version bump {version}'
     );
-    expect(config.author).toEqual({
-      name: 'Rob Schneider',
-      email: 'rschneider@github.com',
-    });
   });
   it('parses the json configuration', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
         configuration: 'some/path/config.json',
       })
     );
@@ -68,17 +60,14 @@ describe('utils', () => {
           {
             type: 'major',
             keywords: ['MAJOR'],
-            labels: [],
           },
           {
             type: 'minor',
             keywords: ['feat'],
-            labels: ['enhancement'],
           },
           {
             type: 'patch',
             keywords: ['patch', 'fix', 'bug'],
-            labels: ['bug', 'fix'],
           },
         ],
         default_bump_type: 'patch',
@@ -87,28 +76,21 @@ describe('utils', () => {
     );
     const config = new ActionConfig();
     expect(config.bumpTypes).toEqual([
-      { type: 'major', keywords: ['MAJOR'], labels: [] },
-      { type: 'minor', keywords: ['feat'], labels: ['enhancement'] },
+      { type: 'major', keywords: ['MAJOR'] },
+      { type: 'minor', keywords: ['feat'] },
       {
         type: 'patch',
         keywords: ['patch', 'fix', 'bug'],
-        labels: ['bug', 'fix'],
       },
     ]);
     expect(config.defaultBumpType).toEqual('patch');
     expect(config.commitMessage).toEqual(
       '[skip ci]: Automated version bump {version}'
     );
-    expect(config.author).toEqual({
-      name: 'Rob Schneider',
-      email: 'rschneider@github.com',
-    });
   });
   it('overwrites yaml configuration with json configuration', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
         'commit-message': '[skip ci]: YAML rules',
         'keywords-major': 'MAJOR',
         'keywords-minor': 'feat',
@@ -122,17 +104,14 @@ describe('utils', () => {
           {
             type: 'major',
             keywords: ['BREAKING'],
-            labels: [],
           },
           {
             type: 'minor',
             keywords: ['amazing'],
-            labels: ['enhancement'],
           },
           {
             type: 'patch',
             keywords: ['bump'],
-            labels: ['bug', 'fix'],
           },
         ],
         default_bump_type: 'minor',
@@ -141,26 +120,19 @@ describe('utils', () => {
     );
     const config = new ActionConfig();
     expect(config.bumpTypes).toEqual([
-      { type: 'major', keywords: ['BREAKING'], labels: [] },
-      { type: 'minor', keywords: ['amazing'], labels: ['enhancement'] },
+      { type: 'major', keywords: ['BREAKING'] },
+      { type: 'minor', keywords: ['amazing'] },
       {
         type: 'patch',
         keywords: ['bump'],
-        labels: ['bug', 'fix'],
       },
     ]);
     expect(config.defaultBumpType).toEqual('minor');
     expect(config.commitMessage).toEqual('[skip ci]: JSON rules');
-    expect(config.author).toEqual({
-      name: 'Rob Schneider',
-      email: 'rschneider@github.com',
-    });
   });
   it('requires commit message', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
         'keywords-major': 'MAJOR',
         'default-bump-type': 'patch',
       })
@@ -173,8 +145,6 @@ describe('utils', () => {
   it('requires keywords or a default bump type', async () => {
     mockGetInput.mockImplementation(
       getCoreInputMock({
-        'author-name': 'Rob Schneider',
-        'author-email': 'rschneider@github.com',
         'commit-message': '[skip ci]: Automated version bump {version}',
       })
     );
