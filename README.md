@@ -66,7 +66,7 @@ See [actions/checkout](https://github.com/actions/checkout/) for more info about
 
 <!-- start workflow1 -->
 ```yaml
-name: Bump Version and Create Tag
+name: Bump Version
 
 on:
   pull_request:
@@ -75,8 +75,8 @@ on:
     types: [closed]
 
 jobs:
-  bump_and_tag:
-    name: Bump and Tag
+  bump:
+    name: Bump
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.merged }}
     env: 
