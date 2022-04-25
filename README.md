@@ -131,6 +131,7 @@ All of the configuration options available in the workflow yaml can be configure
 <!-- end config -->
 
 # Outputs
+The action outputs the bumped version that can be used in later actions in the same job.
 <!-- start output -->
 ```yaml
 # The package version after being bumped
