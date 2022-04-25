@@ -1,6 +1,6 @@
 # Keyword Version Bump
 
-This action bumps and commits a project's version using the [Semantic Versioning system](https://semver.org/). The type of bump is determined by searching a target string with a list of keywords.  The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
+This action bumps and commits a node project's version using the [Semantic Versioning system](https://semver.org/). The type of bump is determined by searching a target string with a list of keywords.  The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
 
 # Usage
 
