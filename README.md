@@ -91,7 +91,7 @@ jobs:
 
 # External configuration file
 
-All of the configuration options besides the `search-target` can be configured through an external json file.  Configuration options in the external file will over-ride any options given through the workflow yaml.
+All of the configuration options besides the `search-target` can be configured through an external json file.  Configuration options in the external file will over-ride any options configured through the workflow.
 
 ### example-bump-workflow.yml
 
@@ -125,10 +125,6 @@ All of the configuration options besides the `search-target` can be configured t
     }
   ],
   "default_bump_type": "patch",
-  "author": {
-    "name": "Billy Bob",
-    "email": "bbob@email.com"
-  },
   "commit_message": "[skip ci]: Automated version bump {version}"
 }
 ```
