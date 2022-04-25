@@ -56,7 +56,7 @@ The available bump types are:
 
 This action relies on [actions/checkout](https://github.com/actions/checkout/) for checking out the repo and setting up the environment.
 
-The following is an example of a workflow that bumps and tags the project after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
+The following is an example of a workflow that bumps the project version after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
 
 This example workflow would commit directly to `main` and thus would need permission to do so.  If no branch protection rule is in place, the default `secrets.GITHUB_TOKEN` would suffice.  Otherwise, either an ssh key (used in this example) or a PAT (personal access token) should be provided to the @actions/checkout step.
 
@@ -100,15 +100,6 @@ jobs:
         with:
           search-target: ${{ github.event.pull_request.title }}
           configuration: '.github/workflows/bump-version.config.json'
-      
-      - name: Set Tag Name
-        id: set_tag_name
-        run: echo "::set-output name=tag_name::v${{ steps.bump_version.outputs.bumped_version }}"
-      
-      - name: Create Tag
-        run: |
-          git tag ${{ steps.set_tag_name.outputs.tag_name }}
-          git push origin ${{ steps.set_tag_name.outputs.tag_name }}
 ```
 <!-- end workflow1 -->
 
