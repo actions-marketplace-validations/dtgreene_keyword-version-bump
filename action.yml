@@ -1,5 +1,5 @@
-name: 'Bump Version'
-description: Bump a projects version
+name: 'Keyword Version Bump'
+description: Bumps project version based on a list of keywords
 runs:
   using: node16
   main: dist/index.js
