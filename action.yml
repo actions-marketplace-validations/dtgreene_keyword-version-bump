@@ -1,5 +1,5 @@
-name: Auto Bumper
-description: Automatically bumps a projects version
+name: Bump Version
+description: Bump a projects version
 runs:
   using: node16
   main: dist/index.js

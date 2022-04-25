@@ -1,9 +1,9 @@
 {
-  "name": "actions-auto-bumper",
+  "name": "actions-bump-version",
   "version": "0.1.0",
   "main": "src/index.js",
   "scripts": {
-    "build": "ncc build src/auto-bumper.ts -o dist -m",
+    "build": "ncc build src/bump-version.ts -o dist -m",
     "test": "jest --silent",
     "test:watch": "jest --watchAll"
   },
