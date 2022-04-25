@@ -4,12 +4,15 @@ on:
   push
 
 jobs:
-  tests:
-    name: Run tests
+  test_and_build:
+    name: Test and Build
     runs-on: ubuntu-latest
+    env: 
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # Checkout the Repo
-      - uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
       # Install Node 16
       - name: Setup Node
@@ -18,7 +21,29 @@ jobs:
           node-version: 16
 
       # Install dependencies
-      - run: npm ci
-
+      - name: Install
+        run: npm ci
+      
       # Run tests
-      - run: npm test
+      - name: Test
+        run: npm run test
+        
+      # Create build
+      - name: Build
+        run: npm run build
+        
+      # Check git status
+      - name: Determine Status
+        run: |
+          if git status | grep -q 'nothing to commit'; then
+            echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          fi
+      
+      # Commit if build is different
+      - name: Commit Build
+        if: ${{ env.HAS_CHANGES == true }}
+        run: |
+          git config --local user.email "ciworkflow@github.fake"
+          git config --local user.name "CI Workflow"
+          git add dist
+          git commit -m "Build updated"
