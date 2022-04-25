@@ -81,7 +81,7 @@ jobs:
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
       - name: 'Bump Version'
-        uses: 'dtgreene/actions-bump-version@v1'
+        uses: 'dtgreene/actions-bump-version@main'
         with:
           author-name: 'Billy Bob'
           author-email: 'bbob@email.com'
@@ -101,7 +101,7 @@ All of the configuration options available in the workflow yaml can be configure
 <!-- start workflow2 -->
 ```yaml
 - name: 'Bump Version'
-  uses: 'dtgreene/actions-bump-version@v1'
+  uses: 'dtgreene/actions-bump-version@main'
   with:
     configuration: '.github/workflows/bump-version.config.json'
 ```
