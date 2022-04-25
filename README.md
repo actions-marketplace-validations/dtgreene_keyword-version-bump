@@ -43,7 +43,7 @@ Bump type labels can only be specified when using an external configuration file
 
 # Workflow example
 
-This action relies on [actions/checkout](https://github.com/actions/checkout/) setting up the repo with the correct authentication.
+This action relies on [actions/checkout](https://github.com/actions/checkout/) for setting up the environment.
 
 ### example-auto-bumper.yml
 
