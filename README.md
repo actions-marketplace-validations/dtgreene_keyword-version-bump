@@ -58,7 +58,7 @@ This action relies on [actions/checkout](https://github.com/actions/checkout/) f
 
 <!-- start workflow1 -->
 ```yaml
-name: 'Bump Version'
+name: Bump Version
 
 on:
   pull_request:
@@ -74,13 +74,13 @@ jobs:
     env: 
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: 'Checkout Repo'
+      - name: Checkout Repo
         uses: 'actions/checkout@v3'
         with:
           persist-credentials: true
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
-      - name: 'Bump Version'
+      - name: Bump Version
         uses: 'dtgreene/actions-bump-version@main'
         with:
           author-name: 'Billy Bob'
@@ -100,7 +100,7 @@ All of the configuration options available in the workflow yaml can be configure
 
 <!-- start workflow2 -->
 ```yaml
-- name: 'Bump Version'
+- name: Bump Version
   uses: 'dtgreene/actions-bump-version@main'
   with:
     configuration: '.github/workflows/bump-version.config.json'
