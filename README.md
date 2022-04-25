@@ -44,15 +44,25 @@ The available bump types are:
 - `prepatch`
 - `prerelease`
 
+# Output
+<!-- start output -->
+```yaml
+# The package version after being bumped
+- bumped_version: ''
+```
+<!-- end output -->
+
 # Workflow example
 
 This action relies on [actions/checkout](https://github.com/actions/checkout/) for checking out the repo and setting up the environment.
+
+The following is an example of a workflow that bumps and tags the project after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
 
 ### example-bump-workflow.yml
 
 <!-- start workflow1 -->
 ```yaml
-name: Bump Version
+name: Bump Version and Create Tag
 
 on:
   pull_request:
@@ -61,8 +71,8 @@ on:
     types: [closed]
 
 jobs:
-  checkout_and_bump:
-    name: Checkout and Bump
+  bump_and_tag:
+    name: Bump and Tag
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.merged }}
     env: 
@@ -74,18 +84,27 @@ jobs:
           persist-credentials: true
           ref: ${{ github.ref }}
           ssh-key: ${{ secrets.SSH_KEY }}
-      - name: Setup Author
+  
+      - name: Set Author
         run: |
-          git config --local user.name 'Version Bump'
-          git config --local user.email 'version-bump@github.fake'
+          git config --local user.name 'Bump and Tag'
+          git config --local user.email 'bump-and-tag@github-actions.fake'  
+        
       - name: Bump Version
+        id: bump_version
         uses: 'dtgreene/keyword-version-bump@main'
         with:
           search-target: ${{ github.event.pull_request.title }}
-          keywords-major: ''
-          keywords-minor: 'feat'
-          keywords-patch: 'fix,bug'
-          default-bump-type: 'minor'
+          configuration: '.github/workflows/bump-version.config.json'
+      
+      - name: Set Tag Name
+        id: set_tag_name
+        run: echo "::set-output name=tag_name::v${{ steps.bump_version.outputs.bumped_version }}"
+      
+      - name: Create Tag
+        run: |
+          git tag ${{ steps.set_tag_name.outputs.tag_name }}
+          git push origin ${{ steps.set_tag_name.outputs.tag_name }}
 ```
 <!-- end workflow1 -->
 
@@ -129,11 +148,3 @@ All of the configuration options besides the `search-target` can be configured t
 }
 ```
 <!-- end config -->
-
-# Output
-<!-- start output -->
-```yaml
-# The package version after being bumped
-- bumped_version: ''
-```
-<!-- end output -->
