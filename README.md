@@ -1,12 +1,12 @@
-# Bump Version
+# Keyword Version Bump
 
-This action bumps and commits an node project's version using the [Semantic Versioning system](https://semver.org/). The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
+This action bumps and commits a project's version using the [Semantic Versioning system](https://semver.org/). The type of bump is determined by searching a target string with a list of keywords.  The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
 
 # Usage
 
 <!-- start usage -->
 ```yaml
-- uses: 'dtgreene/actions-bump-version@v1'
+- uses: 'dtgreene/keyword-version-bump@v1'
   with:
     # The target word used for searching for keywords.
     search-target: ''
@@ -61,8 +61,8 @@ on:
     types: [closed]
 
 jobs:
-  bump_version:
-    name: Bump Version
+  checkout_and_bump:
+    name: Checkout and Bump
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.merged }}
     env: 
@@ -76,10 +76,10 @@ jobs:
           ssh-key: ${{ secrets.SSH_KEY }}
       - name: Setup Author
         run: |
-          git config --local user.name 'Bump Version'
-          git config --local user.email 'bump-version@github.fake'
+          git config --local user.name 'Version Bump'
+          git config --local user.email 'version-bump@github.fake'
       - name: Bump Version
-        uses: 'dtgreene/actions-bump-version@main'
+        uses: 'dtgreene/keyword-version-bump@main'
         with:
           search-target: ${{ github.event.pull_request.title }}
           keywords-major: ''
@@ -98,14 +98,14 @@ All of the configuration options besides the `search-target` can be configured t
 <!-- start workflow2 -->
 ```yaml
 - name: Bump Version
-  uses: 'dtgreene/actions-bump-version@main'
+  uses: 'dtgreene/keyword-version-bump@main'
   with:
     search-target: ${{ github.event.pull_request.title }}
-    configuration: '.github/workflows/bump-version.config.json'
+    configuration: '.github/workflows/version-bump.config.json'
 ```
 <!-- end workflow2 -->
 
-### example-bump-workflow.yml
+### version-bump.config.json
 
 <!-- start config -->
 ```json
