@@ -130,5 +130,11 @@ All of the configuration options available in the workflow yaml can be configure
 ```
 <!-- end config -->
 
-# Future 
-- Potentially perform keyword searches on the workflow event's `head_commit.message` instead of just the `pull_request.title`
+# Outputs
+The action outputs the bumped version that can be used in other actions.
+<!-- start output -->
+```yaml
+# The package version after being bumped
+- bumped_version: ''
+```
+<!-- end output -->
