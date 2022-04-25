@@ -36,6 +36,8 @@ jobs:
       - name: Determine Status
         run: |
           if git status | grep -q 'nothing to commit'; then
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
+          else
             echo "HAS_CHANGES=true" >> $GITHUB_ENV
           fi
       
