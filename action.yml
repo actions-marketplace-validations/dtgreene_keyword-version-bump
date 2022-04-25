@@ -1,5 +1,5 @@
-name: Bump and Tag
-description: Automatically bumps a projects version and creates a new tag
+name: Auto Bumper
+description: Automatically bumps a projects version
 runs:
   using: node16
   main: dist/index.js
