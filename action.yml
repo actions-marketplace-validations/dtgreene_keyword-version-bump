@@ -36,6 +36,6 @@ inputs:
     default: '[skip ci]: Automated version bump {version}'
     required: false
   configuration:
-    description: 'Path to a JSON configuration file'
+    description: 'Path to an external json configuration file'
     default: ''
     required: false
