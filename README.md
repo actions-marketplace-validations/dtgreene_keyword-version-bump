@@ -2,7 +2,7 @@
 
 This action bumps and commits an npm project's `package.json` version using the [Semantic Versioning system](https://semver.org/). The npm package [semver](https://www.npmjs.com/package/semver) is used for incrementing and validating the version.
 
-This action was designed to work with pull request events since the pull request's title is used for matching keywords.
+This action was designed to work with pull request events as the trigger since the pull request's title is used for matching keywords.
 
 # Usage
 
