@@ -58,7 +58,7 @@ This action relies on [actions/checkout](https://github.com/actions/checkout/) f
 
 The following is an example of a workflow that bumps and tags the project after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
 
-This example workflow would commit directly to `main` and will need permission to do so.  If no branch protection rule is in place, the default `secrets.GITHUB_TOKEN` should suffice.  Otherwise, either an ssh key or a PAT (personal access token) should be provided to the @actions/checkout step.
+This example workflow would commit directly to `main` and thus would need permission to do so.  If no branch protection rule is in place, the default `secrets.GITHUB_TOKEN` would suffice.  Otherwise, either an ssh key or a PAT (personal access token) should be provided to the @actions/checkout step.
 
 See [actions/checkout](https://github.com/actions/checkout/) for more info.
 
