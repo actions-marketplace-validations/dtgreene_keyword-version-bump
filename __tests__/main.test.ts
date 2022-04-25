@@ -25,7 +25,7 @@ const mockLog = jest.fn();
 jest.mock('../src/utils', () => ({
   ...(jest.requireActual('../src/utils') as object),
   exitFailure: (message?: string) => mockExitFailure(message),
-  exitSuccess: () => mockExitSuccess(),
+  exitSuccess: (message?: string) => mockExitSuccess(message),
   execute: (command: string) => mockExecute(command),
   logger: {
     info: (message?: any) => mockLog(message),
@@ -79,6 +79,9 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
+      expect(mockExitSuccess).toHaveBeenCalledWith(
+        'Bumped version 1.2.3 -> 1.3.0'
+      );
       expect(mockLog.mock.calls).toEqual([
         ['Found keyword match: feat; for bump type: minor'],
         ['Using bump type: minor'],
@@ -132,6 +135,9 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
+      expect(mockExitSuccess).toHaveBeenCalledWith(
+        'Bumped version 1.2.3 -> 2.0.0'
+      );
       expect(mockLog.mock.calls).toEqual([
         ['Found label match: breaking; for bump type: major'],
         ['Using bump type: major'],
@@ -174,6 +180,9 @@ describe('main', () => {
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
       expect(mockExitSuccess).toHaveBeenCalledTimes(1);
+      expect(mockExitSuccess).toHaveBeenCalledWith(
+        'Bumped version 1.2.3 -> 1.2.4'
+      );
       expect(mockLog.mock.calls).toEqual([
         ['No matches found; using default bump type: patch'],
         ['Using bump type: patch'],
