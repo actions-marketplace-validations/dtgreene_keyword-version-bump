@@ -52,7 +52,7 @@ The available bump types are:
 
 # Workflow example
 
-This action relies on [actions/checkout](https://github.com/actions/checkout/) for setting up the environment.
+This action relies on [actions/checkout](https://github.com/actions/checkout/) for checking out the repo and setting up the environment.
 
 ### example-bump-workflow.yml
 
