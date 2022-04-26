@@ -157,7 +157,7 @@ describe('main', () => {
         'Bumped version 1.2.3 -> 1.2.4'
       );
       expect(mockLog.mock.calls).toEqual([
-        ['No matches found; using default bump type: patch'],
+        ['No bump type could be matched; using default: patch'],
         ['Using bump type: patch'],
       ]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(0);

@@ -1,7 +1,18 @@
 import * as core from '@actions/core';
-import * as semver from 'semver';
 import { logger, execute, exitFailure, exitSuccess } from './utils';
 import { ActionConfig } from './action-config';
+
+const bumpTypes = [
+  'major',
+  'premajor',
+  'minor',
+  'preminor',
+  'patch',
+  'prepatch',
+  'prerelease'
+] as const;
+
+type BumpType = typeof bumpTypes[number]
 
 export async function run() {
   try {
@@ -63,8 +74,11 @@ function getBumpType(config: ActionConfig, target: string) {
 
   if (!matchResult) {
     matchResult = config.defaultBumpType;
-    logger.warn(`No matches found; using default bump type: ${matchResult}`);
+    logger.warn(`No bump type could be matched; using default: ${matchResult}`);
+  } else if (!bumpTypes.includes(matchResult as BumpType)) {
+    exitFailure(`Matched bump type is not valid: ${matchResult}`);
   }
+
   logger.success(`Using bump type: ${matchResult}`);
-  return matchResult as semver.ReleaseType;
+  return matchResult as BumpType;
 }
