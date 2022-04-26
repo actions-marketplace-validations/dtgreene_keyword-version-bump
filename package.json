@@ -1,6 +1,6 @@
 {
   "name": "keyword-version-bump",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
     "build": "ncc build src/version-bump.ts -o dist -m",
