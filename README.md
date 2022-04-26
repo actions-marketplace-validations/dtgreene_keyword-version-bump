@@ -56,9 +56,11 @@ The available bump types are:
 
 This action relies on [actions/checkout](https://github.com/actions/checkout/) for checking out the repo and setting up the environment.
 
-The following is an example of a workflow that bumps the project version after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
+The following is an example of a workflow that bumps a project's version after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
 
-This example workflow would commit directly to `main` and thus would need permission to do so.  If no branch protection rule is in place, the default `secrets.GITHUB_TOKEN` would suffice.  Otherwise, either an ssh key (used in this example) or a PAT (personal access token) should be provided to the @actions/checkout step.
+In this example, changes will be made directly to the `main` branch. In most repos that would fail due to branch protection rules.  If no branch protection rules are in place, the default `secrets.GITHUB_TOKEN` should have enough permission. 
+
+Otherwise, an ssh key (used here) or a PAT (personal access token) that belongs to a user with the right permission should be provided in the @actions/checkout step.
 
 See [actions/checkout](https://github.com/actions/checkout/) for more info about the permission options.
 
@@ -105,7 +107,7 @@ jobs:
 
 # External configuration file
 
-All of the configuration options besides the `search-target` can be configured through an external json file.  Configuration options in the external file will over-ride any options configured through the workflow.
+All configuration options aside from the `search-target` can be configured through an external json file.  Configuration options in the external file override any options provided through the workflow.
 
 ### example-bump-workflow.yml
 
