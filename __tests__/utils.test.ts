@@ -20,9 +20,16 @@ const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
 });
 
 // mock fs
-const mockReadFileSync = fs.readFileSync as jest.Mock;
-const mockWriteFileSync = fs.writeFileSync as jest.Mock;
-jest.mock('fs');
+const mockReadFileSync = jest.fn();
+const mockWriteFileSync = jest.fn();
+jest.mock('fs', () => ({
+  ...(jest.requireActual('fs') as object),
+  readFileSync: () => mockReadFileSync(),
+  writeFileSync: () => mockWriteFileSync(),
+  // @actions/core destructures 'fs' at runtime
+  // just importing @actions/core will throw if 'fs' is not mocked properly
+  promises: () => Promise.resolve()
+}));
 
 describe('utils', () => {
   beforeAll(() => mockExecSync.mockReturnValue(Buffer.from('')));

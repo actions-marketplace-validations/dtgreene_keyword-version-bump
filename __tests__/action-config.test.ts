@@ -7,8 +7,14 @@ import { getFileBuffer, getCoreInputMock } from './test-utils';
 jest.mock('child_process');
 
 // mock fs
-const mockReadFileSync = fs.readFileSync as jest.Mock;
-jest.mock('fs');
+const mockReadFileSync = jest.fn();
+jest.mock('fs', () => ({
+  ...(jest.requireActual('fs') as object),
+  readFileSync: () => mockReadFileSync(),
+  // @actions/core destructures 'fs' at runtime
+  // just importing @actions/core will throw if 'fs' is not mocked properly
+  promises: () => Promise.resolve()
+}));
 
 // mock core
 const mockGetInput = core.getInput as jest.Mock;
