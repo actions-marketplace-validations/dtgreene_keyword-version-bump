@@ -6,7 +6,7 @@ This action bumps and commits a node project's version using the [Semantic Versi
 
 <!-- start usage -->
 ```yaml
-- uses: 'dtgreene/keyword-version-bump@v1'
+- uses: 'dtgreene/keyword-version-bump@main'
   with:
     # The target word used for searching for keywords.
     search-target: ''
@@ -98,7 +98,7 @@ jobs:
         
       - name: Bump Version
         id: bump_version
-        uses: 'dtgreene/keyword-version-bump@v1'
+        uses: 'dtgreene/keyword-version-bump@main'
         with:
           search-target: ${{ github.event.pull_request.title }}
           configuration: '.github/workflows/bump-version.config.json'
@@ -114,7 +114,7 @@ All configuration options aside from the `search-target` can be configured throu
 <!-- start workflow2 -->
 ```yaml
 - name: Bump Version
-  uses: 'dtgreene/keyword-version-bump@v1'
+  uses: 'dtgreene/keyword-version-bump@main'
   with:
     search-target: ${{ github.event.pull_request.title }}
     configuration: '.github/workflows/version-bump.config.json'
