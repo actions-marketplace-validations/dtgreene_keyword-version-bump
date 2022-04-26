@@ -26,7 +26,7 @@ jest.mock('../src/utils', () => ({
   ...(jest.requireActual('../src/utils') as object),
   exitFailure: (message?: string) => {
     console.log(message);
-    mockExitFailure(message)
+    mockExitFailure(message);
   },
   exitSuccess: (message?: string) => mockExitSuccess(message),
   execute: (command: string) => mockExecute(command),
@@ -36,8 +36,6 @@ jest.mock('../src/utils', () => ({
     success: (message?: any) => mockLog(message),
   },
 }));
-
-const packageBuffer = getFileBuffer({ version: '1.2.3' });
 
 describe('main', () => {
   beforeAll(() => {
@@ -56,7 +54,8 @@ describe('main', () => {
         'keywords-minor': 'feat',
       })
     );
-    mockReadFileSync.mockReturnValueOnce(packageBuffer);
+    mockExecute.mockReturnValueOnce('"1.2.3"');
+    mockExecute.mockReturnValueOnce('v1.3.0');
     try {
       await run();
       // the above line will "throw" when process.exit is called
@@ -65,8 +64,9 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ['git add ./package.json'],
-        ['git commit -m "[skip ci]: Automated version bump 1.3.0"'],
+        ['npm pkg get version'],
+        ['npm version --no-git-tag-version minor'],
+        ['git commit -am "[skip ci]: Automated version bump 1.3.0"'],
         ['git push'],
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
@@ -78,7 +78,7 @@ describe('main', () => {
         ['Found keyword match: feat; for bump type: minor'],
         ['Using bump type: minor'],
       ]);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(1);
+      expect(mockReadFileSync).toHaveBeenCalledTimes(0);
       expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.3.0']]);
     }
   });
@@ -97,10 +97,11 @@ describe('main', () => {
             keywords: ['BREAKING'],
           },
         ],
-        commit_message: '[skip ci]: Automated version bump {version}'
+        commit_message: '[skip ci]: Automated version bump {version}',
       })
     );
-    mockReadFileSync.mockReturnValueOnce(packageBuffer);
+    mockExecute.mockReturnValueOnce('"1.2.3"');
+    mockExecute.mockReturnValueOnce('v2.0.0');
     try {
       await run();
       // the above line will "throw" when process.exit is called
@@ -109,8 +110,9 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ['git add ./package.json'],
-        ['git commit -m "[skip ci]: Automated version bump 2.0.0"'],
+        ['npm pkg get version'],
+        ['npm version --no-git-tag-version major'],
+        ['git commit -am "[skip ci]: Automated version bump 2.0.0"'],
         ['git push'],
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
@@ -122,7 +124,7 @@ describe('main', () => {
         ['Found keyword match: BREAKING; for bump type: major'],
         ['Using bump type: major'],
       ]);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(2);
+      expect(mockReadFileSync).toHaveBeenCalledTimes(1);
       expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '2.0.0']]);
     }
   });
@@ -134,7 +136,8 @@ describe('main', () => {
         'default-bump-type': 'patch',
       })
     );
-    mockReadFileSync.mockReturnValueOnce(packageBuffer);
+    mockExecute.mockReturnValueOnce('"1.2.3"');
+    mockExecute.mockReturnValueOnce('v1.2.4');
     try {
       await run();
       // the above line will "throw" when process.exit is called
@@ -143,8 +146,9 @@ describe('main', () => {
     } catch (e) {
       // check execute commands
       expect(mockExecute.mock.calls).toEqual([
-        ['git add ./package.json'],
-        ['git commit -m "[skip ci]: Automated version bump 1.2.4"'],
+        ['npm pkg get version'],
+        ['npm version --no-git-tag-version patch'],
+        ['git commit -am "[skip ci]: Automated version bump 1.2.4"'],
         ['git push'],
       ]);
       expect(mockExitFailure).toHaveBeenCalledTimes(0);
@@ -156,7 +160,7 @@ describe('main', () => {
         ['No matches found; using default bump type: patch'],
         ['Using bump type: patch'],
       ]);
-      expect(mockReadFileSync).toHaveBeenCalledTimes(1);
+      expect(mockReadFileSync).toHaveBeenCalledTimes(0);
       expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.2.4']]);
     }
   });

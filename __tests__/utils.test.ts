@@ -25,9 +25,8 @@ const mockWriteFileSync = fs.writeFileSync as jest.Mock;
 jest.mock('fs');
 
 describe('utils', () => {
-  afterEach(() => {
-    resetEnv();
-  });
+  beforeAll(() => mockExecSync.mockReturnValue(Buffer.from('')));
+  afterEach(() => resetEnv());
   it('loadJson', () => {
     mockReadFileSync.mockReturnValueOnce(getFileBuffer({ version: '1.2.3' }));
     expect(loadJson('some/file/path')).toEqual({ version: '1.2.3' });
