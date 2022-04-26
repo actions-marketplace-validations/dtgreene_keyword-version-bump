@@ -28,7 +28,7 @@ export async function run() {
     // e.g. major | premajor | minor | preminor | patch | prepatch | prerelease
     const bumpType = getBumpType(config, searchTarget);
 
-    // bump the version
+    // bump both the package.json and package-lock.json versions
     // e.g. 'v1.2.3'
     const bumpCommand = `npm version --no-git-tag-version ${bumpType}`;
     const bumpedVersion = execute(bumpCommand).replace(/v/g, '');
