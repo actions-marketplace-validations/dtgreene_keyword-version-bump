@@ -74,7 +74,7 @@ function getBumpType(config: ActionConfig, target: string) {
 
   if (!matchResult) {
     matchResult = config.defaultBumpType;
-    logger.warn(`No bump type could be matched; using default: ${matchResult}`);
+    core.notice(`No bump type could be matched; using default: ${matchResult}`);
   } else if (!bumpTypes.includes(matchResult as BumpType)) {
     exitFailure(`Matched bump type is not valid: ${matchResult}`);
   }

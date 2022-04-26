@@ -13,6 +13,7 @@ jest.mock('fs');
 // mock core
 const mockGetInput = core.getInput as jest.Mock;
 const mockSetOuput = core.setOutput as jest.Mock;
+const mockNotice = core.notice as jest.Mock;
 jest.mock('@actions/core');
 
 // mock utils
@@ -156,10 +157,10 @@ describe('main', () => {
       expect(mockExitSuccess).toHaveBeenCalledWith(
         'Bumped version 1.2.3 -> 1.2.4'
       );
-      expect(mockLog.mock.calls).toEqual([
-        ['No bump type could be matched; using default: patch'],
-        ['Using bump type: patch'],
-      ]);
+      expect(mockNotice).toHaveBeenCalledWith(
+        'No bump type could be matched; using default: patch'
+      );
+      expect(mockLog.mock.calls).toEqual([['Using bump type: patch']]);
       expect(mockReadFileSync).toHaveBeenCalledTimes(0);
       expect(mockSetOuput.mock.calls).toEqual([['bumped_version', '1.2.4']]);
     }
