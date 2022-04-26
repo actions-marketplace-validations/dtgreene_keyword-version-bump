@@ -55,7 +55,7 @@ export function execute(command: string) {
   logger.info(command);
   try {
     // setting stdio to pipe will prevent default logging of stdout
-    return execSync(command, { cwd: workingDirectory, stdio: 'pipe' });
+    return execSync(command, { cwd: workingDirectory, stdio: 'pipe' }).toString();
   } catch (e) {
     exitFailure(`Execute failed with error: ${e}`);
   }

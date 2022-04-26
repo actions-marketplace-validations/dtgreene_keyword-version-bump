@@ -1,36 +1,44 @@
-import * as assert from 'assert';
 import * as core from '@actions/core';
-import * as path from 'path';
-import * as semver from 'semver';
-import {
-  logger,
-  execute,
-  exitFailure,
-  exitSuccess,
-  getEnv,
-} from './utils';
+import { logger, execute, exitFailure, exitSuccess } from './utils';
 import { ActionConfig } from './action-config';
-import { PackageReader } from './package-reader';
+
+const bumpTypes = [
+  'major',
+  'premajor',
+  'minor',
+  'preminor',
+  'patch',
+  'prepatch',
+  'prerelease'
+] as const;
+
+type BumpType = typeof bumpTypes[number]
 
 export async function run() {
   try {
     // parse our action configuration
     const config = new ActionConfig();
     const searchTarget = core.getInput('search-target', { required: true });
-    // load the package.json
-    const packagePath = path.join(getEnv('GITHUB_WORKSPACE'), 'package.json');
-    const packageReader = new PackageReader(packagePath);
-    const currentVersion = packageReader.version;
-    // get the bumped version
+
+    // get the current version
+    // e.g. "1.2.3" (including the double quotes)
+    const currentVersion = execute('npm pkg get version').replace(/"/g, '');
+
+    // get the bump type
+    // e.g. major | premajor | minor | preminor | patch | prepatch | prerelease
     const bumpType = getBumpType(config, searchTarget);
-    const bumpedVersion = bumpVersion(packageReader.version, bumpType);
-    // update and save the package.json
-    packageReader.version = bumpedVersion;
-    packageReader.save();
-    // commit and push the version bump changes
-    execute('git add ./package.json');
+
+    // bump the version
+    // e.g. 'v1.2.3'
+    const bumpCommand = `npm version --no-git-tag-version ${bumpType}`;
+    const bumpedVersion = execute(bumpCommand).replace(/v/g, '');
+
+    // commit the changes
     execute(
-      `git commit -m "${getCommitMessage(config.commitMessage, bumpedVersion)}"`
+      `git commit -am "${getCommitMessage(
+        config.commitMessage,
+        bumpedVersion
+      )}"`
     );
     execute('git push');
 
@@ -66,26 +74,11 @@ function getBumpType(config: ActionConfig, target: string) {
 
   if (!matchResult) {
     matchResult = config.defaultBumpType;
-    logger.warn(`No matches found; using default bump type: ${matchResult}`);
+    core.notice(`No bump type could be matched; using default: ${matchResult}`);
+  } else if (!bumpTypes.includes(matchResult as BumpType)) {
+    exitFailure(`Matched bump type is not valid: ${matchResult}`);
   }
-  logger.success(`Using bump type: ${matchResult}`);
-  return matchResult as semver.ReleaseType;
-}
 
-function bumpVersion(currentVersion: string, type: semver.ReleaseType) {
-  try {
-    // bump the current version
-    const bumpedVersion = semver.inc(
-      currentVersion,
-      type as semver.ReleaseType
-    );
-    // verify the version post-bump
-    assert.ok(
-      bumpedVersion,
-      `Invalid post-bump version; bumped with type: ${type}`
-    );
-    return bumpedVersion;
-  } catch (e) {
-    exitFailure(`Could not bump version; with error: ${e}`);
-  }
+  logger.success(`Using bump type: ${matchResult}`);
+  return matchResult as BumpType;
 }
