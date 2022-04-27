@@ -58,9 +58,9 @@ This action relies on [actions/checkout](https://github.com/actions/checkout/) f
 
 The following is an example of a workflow that bumps a project's version after a pull request is merged into main.  It searches for keywords in the pull request's title to determine the bump type.
 
-In this example, changes will be made directly to the `main` branch. In most repos that would fail due to branch protection rules.  If no branch protection rules are in place, the default `secrets.GITHUB_TOKEN` should have enough permission. 
+In this example, changes will be made directly to the `main` branch. In most repos that would fail due to branch protection rules.  If no branch protection rules are in place, the default `secrets.GITHUB_TOKEN` should have enough permissions. 
 
-Otherwise, an ssh key (used here) or a PAT (personal access token) that belongs to a user with the right permission should be provided in the @actions/checkout step.
+Otherwise, a PAT (personal access token) that belongs to a user with the right permissions should be provided in the @actions/checkout step.
 
 See [actions/checkout](https://github.com/actions/checkout/) for more info about the permission options.
 
@@ -89,7 +89,7 @@ jobs:
         with:
           persist-credentials: true
           ref: ${{ github.ref }}
-          ssh-key: ${{ secrets.SSH_KEY }}
+          token: ${{ secrets.BUMP_TOKEN }}
   
       - name: Set Author
         run: |
